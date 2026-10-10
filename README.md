@@ -1,32 +1,35 @@
-# Highway Rush 🏎️
+# Neon Dusk Circuit (Browser 3D Racing)
 
-A neon-styled arcade car racing game built with plain HTML, CSS, and JavaScript. No libraries, build tools, or server required.
-
-## Play locally
-1. Download or clone this repository.
-2. Open `index.html` in any modern browser.
-
-## Controls
-- **Left Arrow / A** — steer left
-- **Right Arrow / D** — steer right
-- **Enter** — start or restart
-- **Escape** — pause/resume
-- On mobile, use the on-screen left and right buttons.
+Browser-playable 3D racing game built with **Vite + Babylon.js** and deployable to **Netlify**.
 
 ## Features
-- Three-lane highway and animated roadside scenery
-- Traffic cars, collision detection, and crash particles
-- Collectible coins and bonus points
-- Increasing speed and score
-- Best score saved in browser local storage
-- Responsive layout and mobile touch controls
 
-## Publish with GitHub Pages
-1. Create a new repository on GitHub, for example `highway-rush`.
-2. Upload `index.html` and `README.md` to the repository root.
-3. Open **Settings → Pages**.
-4. Under **Build and deployment**, select **Deploy from a branch**.
-5. Choose branch **main** and folder **/(root)**, then click **Save**.
-6. Wait a minute or two. GitHub will show your website URL in the Pages section.
+- **Photorealistic Graphics**: Enhanced car models with detailed body, windows, spoilers, mirrors, and brake discs
+- **Advanced Materials**: Clearcoat paint, chrome rims, and realistic glass windows
+- **High-Quality Rendering**: Supersampling, MSAA, depth of field, and motion blur
+- **Minimap**: Real-time track overview showing your position
+- **Realistic Physics**: Arcade-style driving with responsive controls
+- **Premium Car System**: Unlock flow with payment integration
 
-This is a static website, so you do not need Python, Node.js, or a backend server.
+## Play (Local)
+
+```bash
+npm install
+npm run dev
+```
+
+## Controls
+
+- Keyboard: `W` throttle, `S` brake/reverse, `A/D` steer, `R` reset, `Esc` back to menu
+- Gamepad: left stick steer, RT throttle, LT brake
+- Touch: drag left/right to steer, up/down for throttle/brake
+
+## Premium Car (Prototype Unlock Flow)
+
+- Payment link + unlock code are configured in `src/config.ts`.
+- Unlock state is stored in `localStorage`.
+
+## Deploy (Netlify)
+
+- This repo includes `netlify.toml` (build command `npm run build`, publish dir `dist`).
+- In Netlify: “New site from Git” → select repo → deploy.

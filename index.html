@@ -1,138 +1,16 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<meta name="theme-color" content="#080d18" />
-<meta name="description" content="Highway Rush — a free browser car racing game. Dodge traffic, collect coins, and beat your best score." />
-<title>Highway Rush — Arcade Racing</title>
-<style>
-  :root{--bg:#080d18;--panel:#101a2b;--cyan:#54f6e8;--pink:#ff4f88;--gold:#ffd166;--text:#f3f7ff;--muted:#9aabc6}
-  *{box-sizing:border-box}
-  body{margin:0;min-height:100vh;background:radial-gradient(ellipse at top,#172844 0%,var(--bg) 55%);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;display:flex;align-items:center;justify-content:center;padding:22px}
-  .app{width:min(1100px,100%)}
-  header{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:18px}
-  .brand{display:flex;align-items:center;gap:12px}.logo{width:48px;height:48px;display:grid;place-items:center;border:1px solid #54f6e855;border-radius:15px;background:#54f6e812;font-size:27px;box-shadow:0 0 24px #54f6e81b}
-  h1{font-size:clamp(23px,4vw,36px);line-height:1;margin:0;font-weight:900;letter-spacing:-1.3px}.brand p{margin:6px 0 0;color:var(--muted);font-size:12px;letter-spacing:2px;text-transform:uppercase}
-  .status{border:1px solid #ffffff18;background:#ffffff08;padding:10px 14px;border-radius:999px;color:var(--muted);font-size:12px;white-space:nowrap}.status span{color:var(--cyan);font-weight:800}
-  .layout{display:grid;grid-template-columns:minmax(0,1fr) 250px;gap:18px;align-items:start}
-  .game-shell{position:relative;overflow:hidden;border:1px solid #ffffff1b;border-radius:22px;background:#0c1422;box-shadow:0 22px 70px #0008}
-  canvas{display:block;width:100%;height:auto;aspect-ratio: 3 / 4;max-height:76vh;object-fit:contain;background:#101b2a;touch-action:manipulation}
-  .overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:24px;background:linear-gradient(#07101bbd,#07101be8);backdrop-filter:blur(5px);text-align:center}
-  .overlay.hidden{display:none}.modal{max-width:390px}.eyebrow{color:var(--cyan);font-size:11px;font-weight:900;letter-spacing:3px;text-transform:uppercase}.modal h2{font-size:clamp(30px,5vw,48px);line-height:.98;letter-spacing:-1.5px;margin:12px 0}.modal p{color:#b4c1d8;line-height:1.6;font-size:14px}.btn{border:0;border-radius:12px;padding:13px 20px;background:linear-gradient(100deg,var(--cyan),#83b8ff);color:#07111c;font-weight:900;font-size:14px;cursor:pointer;box-shadow:0 8px 26px #54f6e82b;transition:transform .15s,filter .15s}.btn:hover{transform:translateY(-2px);filter:brightness(1.08)}.btn:active{transform:translateY(0)}
-  .side{display:grid;gap:12px}.panel{background:linear-gradient(145deg,#142137d9,#0c1524e8);border:1px solid #ffffff15;border-radius:18px;padding:17px}.panel h3{font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin:0 0 14px}.statline{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid #ffffff0d;font-size:13px;color:#bac7dc}.statline:last-child{border-bottom:0;padding-bottom:0}.statline strong{color:var(--text);font-size:17px;font-variant-numeric:tabular-nums}.statline strong.gold{color:var(--gold)}.controls{display:grid;grid-template-columns:1fr 1fr;gap:8px}.key{border:1px solid #ffffff20;border-radius:10px;padding:10px 8px;text-align:center;background:#ffffff06;font-size:12px;color:#cbd7e9}.key b{display:block;font-size:17px;color:var(--cyan);margin-bottom:3px}.tip{font-size:12px;color:var(--muted);line-height:1.65;margin:0}.touch-controls{display:none;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}.touch-btn{border:1px solid #ffffff25;background:#142137;color:var(--text);border-radius:14px;padding:14px;font-size:21px;font-weight:900;touch-action:manipulation}
-  footer{text-align:center;color:#657590;font-size:11px;margin-top:16px;letter-spacing:.4px}
-  @media(max-width:780px){body{padding:12px;align-items:flex-start}.layout{grid-template-columns:1fr}.side{grid-template-columns:repeat(2,minmax(0,1fr))}.panel:first-child{grid-column:1/-1}canvas{max-height:none}.status{font-size:10px;padding:9px}.touch-controls{display:grid}}
-  @media(max-width:430px){.side{grid-template-columns:1fr 1fr}.panel{padding:13px}.brand p{font-size:10px}.logo{width:40px;height:40px}}
-</style>
-</head>
-<body>
-<div class="app">
-  <header>
-    <div class="brand"><div class="logo">🏎️</div><div><h1>HIGHWAY <span style="color:var(--cyan)">RUSH</span></h1><p>Arcade racing • Avoid traffic</p></div></div>
-    <div class="status">GAME STATUS: <span id="statusText">READY</span></div>
-  </header>
-  <main class="layout">
-    <section>
-      <div class="game-shell">
-        <canvas id="game" width="600" height="800" aria-label="Highway Rush car racing game"></canvas>
-        <div class="overlay" id="overlay"><div class="modal"><div class="eyebrow">Ready to race?</div><h2 id="overlayTitle">OWN THE<br><span style="color:var(--cyan)">HIGHWAY.</span></h2><p id="overlayText">Dodge traffic, collect golden coins, and see how long you can survive. The road gets faster the longer you last.</p><button class="btn" id="startBtn">START YOUR ENGINE ↗</button><p style="font-size:11px;margin-bottom:0">Press ENTER to start</p></div></div>
-      </div>
-      <div class="touch-controls"><button class="touch-btn" id="leftBtn" aria-label="Steer left">← LEFT</button><button class="touch-btn" id="rightBtn" aria-label="Steer right">RIGHT →</button></div>
-    </section>
-    <aside class="side">
-      <div class="panel"><h3>Race telemetry</h3><div class="statline"><span>Score</span><strong id="score">00000</strong></div><div class="statline"><span>Best run</span><strong class="gold" id="best">00000</strong></div><div class="statline"><span>Coins</span><strong class="gold" id="coins">0 ◈</strong></div><div class="statline"><span>Speed</span><strong id="speed">0 km/h</strong></div><div class="statline"><span>Distance</span><strong id="distance">0.00 km</strong></div></div>
-      <div class="panel"><h3>Controls</h3><div class="controls"><div class="key"><b>← / A</b>Steer left</div><div class="key"><b>D / →</b>Steer right</div><div class="key"><b>ENTER</b>Start / restart</div><div class="key"><b>ESC</b>Pause</div></div></div>
-      <div class="panel"><h3>Race tips</h3><p class="tip">◆ Watch the gaps between cars.<br>◆ Coins add bonus points.<br>◆ Speed rises as your score climbs.<br>◆ One crash ends the run. Can you beat your record?</p></div>
-      <div class="panel"><h3>Mission</h3><p class="tip" id="missionText">Stay on the road and make your first 500 points.</p></div>
-    </aside>
-  </main>
-  <footer>HIGHWAY RUSH • BUILT WITH HTML, CSS & JAVASCRIPT • MADE FOR THE OPEN WEB</footer>
-</div>
-<script>
-(() => {
-  'use strict';
-  const canvas = document.getElementById('game');
-  const ctx = canvas.getContext('2d');
-  const $ = id => document.getElementById(id);
-  const W = canvas.width, H = canvas.height;
-  const road = { x: 90, w: 420, lanes: 3 };
-  const laneW = road.w / road.lanes;
-  let state = 'ready', score = 0, coins = 0, distance = 0, speed = 300;
-  let best = Number(localStorage.getItem('highwayRushBest') || 0);
-  let player, traffic, pickups, particles, roadOffset, spawnTimer, coinTimer, lastTime = 0, animationId;
-  let keys = {left:false,right:false};
-  $('best').textContent = String(best).padStart(5,'0');
-
-  function resetGame(){
-    score=0;coins=0;distance=0;speed=300;roadOffset=0;spawnTimer=.5;coinTimer=1.4;
-    player={lane:1,x:laneCenter(1),y:H-145,w:54,h:94,targetX:laneCenter(1),invulnerable:0};
-    traffic=[];pickups=[];particles=[];updateHud();
-  }
-  function laneCenter(lane){return road.x + laneW*(lane+.5)}
-  function setStatus(s){$('statusText').textContent=s.toUpperCase()}
-  function showOverlay(title, text, button){$('overlayTitle').innerHTML=title;$('overlayText').textContent=text;$('startBtn').textContent=button;$('overlay').classList.remove('hidden')}
-  function startGame(){if(state==='running')return;resetGame();state='running';setStatus('Racing');$('overlay').classList.add('hidden');lastTime=performance.now();}
-  function endGame(){state='over';setStatus('Crashed');if(score>best){best=score;localStorage.setItem('highwayRushBest',String(best));}$('best').textContent=String(best).padStart(5,'0');showOverlay('RACE <span style="color:var(--pink)">OVER.</span>',`You scored ${score} points and collected ${coins} coins. ${score>best-1?'Keep pushing for a new record!':'One more run? Your best is '+best+'.'}`,'RACE AGAIN ↻')}
-  function pauseGame(){if(state==='running'){state='paused';setStatus('Paused');showOverlay('TAKE A <span style="color:var(--gold)">BREATHER.</span>','Your race is paused. Ready to get back on the road?','RESUME RACE ▶')}else if(state==='paused'){state='running';setStatus('Racing');$('overlay').classList.add('hidden');lastTime=performance.now()}}
-  function moveLane(dir){if(state!=='running')return;player.lane=Math.max(0,Math.min(2,player.lane+dir));player.targetX=laneCenter(player.lane)}
-  $('startBtn').addEventListener('click',()=>{if(state==='paused')pauseGame();else startGame()});
-  $('leftBtn').addEventListener('pointerdown',e=>{e.preventDefault();moveLane(-1)});
-  $('rightBtn').addEventListener('pointerdown',e=>{e.preventDefault();moveLane(1)});
-  window.addEventListener('keydown',e=>{if(['ArrowLeft','ArrowRight',' ','Enter'].includes(e.key))e.preventDefault();if(e.key==='ArrowLeft'||e.key.toLowerCase()==='a')moveLane(-1);if(e.key==='ArrowRight'||e.key.toLowerCase()==='d')moveLane(1);if(e.key==='Enter'){if(state==='ready'||state==='over')startGame();else if(state==='paused')pauseGame()}if(e.key==='Escape')pauseGame()});
-
-  function roundedRect(x,y,w,h,r,fill,stroke){ctx.beginPath();ctx.roundRect(x,y,w,h,r);if(fill){ctx.fillStyle=fill;ctx.fill()}if(stroke){ctx.strokeStyle=stroke;ctx.stroke()}}
-  function drawCar(x,y,w,h,color,isPlayer=false){
-    ctx.save();ctx.translate(x,y);
-    // shadow and tyres
-    ctx.fillStyle='#0008';ctx.beginPath();ctx.ellipse(0+h*.03, h*.48,w*.62,h*.48,0,0,Math.PI*2);ctx.fill();
-    ctx.fillStyle='#090d13';roundedRect(-w*.55,-h*.32,w*.22,h*.29,5,'#090d13');roundedRect(w*.33,-h*.32,w*.22,h*.29,5,'#090d13');roundedRect(-w*.55,h*.12,w*.22,h*.29,5,'#090d13');roundedRect(w*.33,h*.12,w*.22,h*.29,5,'#090d13');
-    // body
-    roundedRect(-w*.43,-h*.48,w*.86,h*.96,13,color,'#ffffff55');
-    // bonnet / windshield
-    roundedRect(-w*.31,-h*.31,w*.62,h*.23,8,isPlayer?'#b8fff8':'#b9d8ed');
-    roundedRect(-w*.31,h*.06,w*.62,h*.2,7,isPlayer?'#b8fff8':'#b9d8ed');
-    // roof stripe and lights
-    if(isPlayer){ctx.fillStyle='#effffc';ctx.fillRect(-w*.045,-h*.44,w*.09,h*.86);ctx.shadowColor='#54f6e8';ctx.shadowBlur=14;ctx.fillStyle='#54f6e8';ctx.fillRect(-w*.31,-h*.48,w*.18,4);ctx.fillRect(w*.13,-h*.48,w*.18,4);ctx.shadowBlur=0}
-    else{ctx.fillStyle='#ff4f88';ctx.fillRect(-w*.29,h*.4,w*.17,5);ctx.fillRect(w*.12,h*.4,w*.17,5)}
-    ctx.restore();
-  }
-  function drawRoad(dt){
-    ctx.fillStyle='#122c28';ctx.fillRect(0,0,W,H);
-    // roadside dashes and trees
-    for(let y=-80+(roadOffset%150);y<H+100;y+=150){for(const x of [35,565]){ctx.fillStyle='#21473b';ctx.beginPath();ctx.arc(x,y,21,0,Math.PI*2);ctx.fill();ctx.fillStyle='#2b6048';ctx.beginPath();ctx.arc(x-5,y-7,14,0,Math.PI*2);ctx.fill();}}
-    ctx.fillStyle='#242b36';ctx.fillRect(road.x,0,road.w,H);
-    ctx.fillStyle='#e8e5cf';ctx.fillRect(road.x+5,0,5,H);ctx.fillRect(road.x+road.w-10,0,5,H);
-    // road texture
-    ctx.strokeStyle='#ffffff08';ctx.lineWidth=2;for(let y=(roadOffset%80);y<H;y+=80){ctx.beginPath();ctx.moveTo(road.x+15,y);ctx.lineTo(road.x+road.w-15,y);ctx.stroke()}
-    ctx.fillStyle='#bfc7d4';for(let lane=1;lane<road.lanes;lane++){let x=road.x+laneW*lane-2;for(let y=-90+(roadOffset%125);y<H;y+=125)ctx.fillRect(x,y,4,65)}
-    // shoulder reflectors
-    for(let y=-30+(roadOffset%70);y<H;y+=70){ctx.fillStyle='#ffd166';ctx.fillRect(road.x-9,y,4,22);ctx.fillRect(road.x+road.w+5,y,4,22)}
-  }
-  function spawnTraffic(){let lane=Math.floor(Math.random()*3);if(traffic.some(t=>t.lane===lane&&t.y<180))lane=(lane+1+Math.floor(Math.random()*2))%3;const colors=['#ff5d73','#ffc857','#7c8cff','#e9edf5','#b66bff'];traffic.push({lane,x:laneCenter(lane),y:-110,w:51,h:88,color:colors[Math.floor(Math.random()*colors.length)],extra:Math.random()*55})}
-  function spawnCoin(){const lane=Math.floor(Math.random()*3);pickups.push({lane,x:laneCenter(lane),y:-30,r:14,spin:Math.random()*6})}
-  function hit(a,b){return Math.abs(a.x-b.x)<(a.w+b.w)*.36&&Math.abs(a.y-b.y)<(a.h+b.h)*.36}
-  function burst(x,y,color){for(let i=0;i<20;i++)particles.push({x,y,vx:(Math.random()-.5)*330,vy:(Math.random()-.5)*330,life:.55+Math.random()*.5,color,size:2+Math.random()*5})}
-  function update(dt){
-    speed=Math.min(720,300+score*.22);const worldSpeed=speed*.8;roadOffset+=worldSpeed*dt;distance+=worldSpeed*dt/1000;score+=Math.floor(dt*12*(speed/300));
-    player.x+=(player.targetX-player.x)*Math.min(1,dt*12);
-    spawnTimer-=dt;if(spawnTimer<=0){spawnTraffic();spawnTimer=Math.max(.48,1.15-(speed-300)/650)+Math.random()*.35}
-    coinTimer-=dt;if(coinTimer<=0){spawnCoin();coinTimer=1.4+Math.random()*1.25}
-    for(let i=traffic.length-1;i>=0;i--){const t=traffic[i];t.y+=(worldSpeed+t.extra)*dt;if(t.y>H+120)traffic.splice(i,1);else if(hit(player,t)){burst(player.x,player.y,'#ff4f88');endGame();return}}
-    for(let i=pickups.length-1;i>=0;i--){const c=pickups[i];c.y+=worldSpeed*dt;c.spin+=dt*5;if(Math.abs(player.x-c.x)<36&&Math.abs(player.y-c.y)<54){coins++;score+=100;burst(c.x,c.y,'#ffd166');pickups.splice(i,1)}else if(c.y>H+30)pickups.splice(i,1)}
-    for(let i=particles.length-1;i>=0;i--){const p=particles[i];p.x+=p.vx*dt;p.y+=p.vy*dt;p.vx*=.97;p.vy*=.97;p.life-=dt;if(p.life<=0)particles.splice(i,1)}
-    updateHud();
-  }
-  function updateHud(){$('score').textContent=String(score).padStart(5,'0');$('coins').textContent=coins+' ◈';$('speed').textContent=Math.round(speed)+' km/h';$('distance').textContent=(distance/10).toFixed(2)+' km';$('missionText').textContent=score<500?'Mission: score your first 500 points. '+Math.max(0,500-score)+' to go!':coins<5?'Mission: collect 5 coins. '+coins+'/5 collected.':'Mission complete! Keep pushing your high score.'}
-  function render(dt){drawRoad(dt);for(const c of pickups){ctx.save();ctx.translate(c.x,c.y);ctx.rotate(c.spin);ctx.shadowColor='#ffd166';ctx.shadowBlur=20;ctx.fillStyle='#ffd166';ctx.beginPath();ctx.moveTo(0,-c.r);ctx.lineTo(c.r*.75,0);ctx.lineTo(0,c.r);ctx.lineTo(-c.r*.75,0);ctx.closePath();ctx.fill();ctx.shadowBlur=0;ctx.fillStyle='#fff1b3';ctx.beginPath();ctx.arc(0,0,4,0,Math.PI*2);ctx.fill();ctx.restore()}
-    for(const t of traffic)drawCar(t.x,t.y,t.w,t.h,t.color,false);if(player){drawCar(player.x,player.y,player.w,player.h,'#20d9cb',true);}
-    for(const p of particles){ctx.globalAlpha=Math.max(0,p.life);ctx.fillStyle=p.color;ctx.fillRect(p.x,p.y,p.size,p.size);ctx.globalAlpha=1}
-    // subtle speed lines at higher speeds
-    if(state==='running'&&speed>500){ctx.strokeStyle='#b8fff81f';ctx.lineWidth=2;for(let i=0;i<12;i++){let x=(i*57+score*3)%W,y=(i*101+roadOffset*2)%(H+100)-50;ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x,y+25+speed/20);ctx.stroke()}}
-  }
-  function loop(now){animationId=requestAnimationFrame(loop);let dt=Math.min((now-lastTime)/1000||0,.04);lastTime=now;if(state==='running')update(dt);render(dt)}
-  resetGame();requestAnimationFrame(loop);
-})();
-</script>
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Neon Dusk Circuit</title>
+    <link rel="icon" href="data:," />
+  </head>
+  <body>
+    <div id="app">
+      <canvas id="game-canvas" aria-label="3D racing game canvas"></canvas>
+      <div id="ui-root" aria-live="polite"></div>
+    </div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
 </html>
